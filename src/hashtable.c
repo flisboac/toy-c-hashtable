@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define INITIAL_HASH_SIZE 16
-#define INITIAL_BUCKET_SIZE 1
+#define DEFAULT_SIZE 16
+#define DEFAULT_LOAD 1
 
 typedef struct {
 
@@ -101,12 +101,12 @@ findBucketEntry(HashTable* H, size_t hash, void* key) {
 
 HashTable*
 HashTable_new() {
-	return HashTable_newWith(INITIAL_HASH_SIZE, INITIAL_BUCKET_SIZE, NULL, NULL);
+	return HashTable_newwith(DEFAULT_SIZE, DEFAULT_LOAD, NULL, NULL);
 }
 
 
 HashTable*
-HashTable_newWith(size_t cap, size_t load, HashTable_hash_f hash, HashTable_alloc_f alloc) {
+HashTable_newwith(size_t cap, size_t load, HashTable_hash_f hash, HashTable_alloc_f alloc) {
 
 	int i;
 	HashTable* H = NULL;
@@ -140,8 +140,14 @@ HashTable_newWith(size_t cap, size_t load, HashTable_hash_f hash, HashTable_allo
 }
 
 
+void
+HashTable_free(HashTable *H) {
+	HashTable_freev(H, NULL, NULL);
+}
+
+
 int
-HashTable_free(HashTable* H, HashTable_collect_f freefn, void* ptr) {
+HashTable_freev(HashTable* H, HashTable_collect_f freefn, void* state) {
 	
 	int status = 1;
 	int i, j;
@@ -149,7 +155,7 @@ HashTable_free(HashTable* H, HashTable_collect_f freefn, void* ptr) {
 	if (H) {
 
 		if (freefn) {
-			if (HashTable_collectobjects(H, freefn, ptr) == 0)
+			if (HashTable_collectobjects(H, freefn, state) == 0)
 				status = 0;
 		}
 
@@ -265,7 +271,7 @@ HashTable_resize(HashTable* H, size_t cap) {
 	 */
 
 	if (H && cap > H->cap) {
-		O = HashTable_newWith(cap, H->load, H->hashf, H->alloc);
+		O = HashTable_newwith(cap, H->load, H->hashf, H->alloc);
 		O->mult = H->mult;
 
 		if (O) {
@@ -287,7 +293,7 @@ HashTable_resize(HashTable* H, size_t cap) {
 			/* Swap hashtable's internals */
 			if (status)	HashTable_swapcontent(H, O);
 
-			HashTable_free(O, NULL);
+			HashTable_free(O);
 		}
 	}
 
@@ -391,7 +397,7 @@ HashTable_gethashf(HashTable *H) {
 size_t
 HashTable_collectobjects(HashTable *H, HashTable_collect_f fn, void* ptr) {
 
-	HashTable *O = HashTable_newWith(H->cap, 1, HashTable_voidphashf, H->alloc);
+	HashTable *O = HashTable_newwith(H->cap, 1, HashTable_voidphashf, H->alloc);
 	size_t count = 0, fail = 0, i, j;
 	Bucket *bucket;
 
@@ -424,7 +430,7 @@ HashTable_collectobjects(HashTable *H, HashTable_collect_f fn, void* ptr) {
 	}
 
 	if (O) {
-		HashTable_free(O, NULL);
+		HashTable_free(O);
 	}
 
 	return count;
