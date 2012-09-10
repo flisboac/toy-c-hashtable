@@ -123,7 +123,7 @@ HashTable_newwith(size_t cap, size_t load, HashTable_hash_f hash, HashTable_allo
 		H->cap = cap;
 		H->alloc = alloc;
 		H->load = load;
-		H->table = alloc(NULL, H->cap * sizeof(Bucket));
+		H->table = alloc(NULL, H->cap * sizeof(Bucket*));
 		H->mult = 0;
 
 		if (!H->table) {
@@ -159,12 +159,10 @@ HashTable_freev(HashTable* H, HashTable_collect_f freefn, void* state) {
 				status = 0;
 		}
 
-		for (i = 0; i < H->cap; i++) {
-			for (j = 0; j < H->load; j++)
-				H->alloc(&(H->table[i][j]), 0);
+		for (i = 0; i < H->cap; i++)
 			H->alloc(H->table[i], 0);
-		}
 
+		H->alloc(H->table, 0);
 		H->alloc(H, 0);
 	}
 

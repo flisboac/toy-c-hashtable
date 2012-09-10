@@ -38,27 +38,27 @@ subjects = {
 	}
 
 	# External libraries
-	, 'csv': {
-		'type': 'ext'
-		, 'sources' : ['csv.c']
-		, 'headers': ['csv.h']
-	}
+	#, 'csv': {
+	#	'type': 'ext'
+	#	, 'sources' : ['csv.c']
+	#	, 'headers': ['csv.h']
+	#}
 
 	# Samples
-	#, 'stars': {
-	#	'type': 'sample'
-	#	, 'sources' : ['stars.c']
-	#	, 'files': ['stars.csv']
-	#	, 'deps': ['csv', 'hashtable']
-	#}
+	, 'stars': {
+		'type': 'sample'
+		, 'sources' : ['stars.c']
+		, 'files': ['stars.csv']
+		, 'deps': ['hashtable']
+	}
 }
 
 
 def options(ctx):
 	helper = Helper(ctx)
 
-	# Default tools
-	ctx.tool_options("compiler_cc")
+	# Waf chore
+	ctx.load("compiler_c")
 
 	# Options
 	ctx.add_option(
@@ -73,13 +73,15 @@ def options(ctx):
 def configure(ctx):
 	helper = Helper(ctx)
 
-	# Load default tools
+	# Load compiler
 	if ctx.options.c_compiler:
-		ctx.check_tool(ctx.options.c_compiler)
+		ctx.load(ctx.options.c_compiler)
 	else:
-		ctx.check_tool("compiler_cc")
+		ctx.load("compiler_c")
 
-	# Load the 
+	# Load other tools
+	ctx.load("doxygen")
+
 
 def build(ctx):
 	helper = Helper(ctx)

@@ -8,8 +8,6 @@
 
 static int toy(int argc, char** argv);
 static int stars(int argc, char** argv);
-static Estrela *loaddata(char* filename, int* size);
-static void freedata(Estrela* estrela);
 
 typedef struct _Estrela {
 
@@ -41,77 +39,13 @@ size_t Estrela_hash(void* key) {
 
 int main(int argc, char** argv) {
 
-	return stars(argc, argv);
+	return toy(argc, argv);
 }
 
 
 int stars(int argc, char** argv) {
-
+	/* TODO */
 	return 0;
-}
-
-
-Estrela *loaddata(char* filename, int* size) {
-
-	FILE* f;
-	Estrela *r;
-	char c;
-	char *str;
-	int line_count = -1;
-	int column_count = 0;
-	size_t r_pos = 0;
-	size_t str_sz = INITIAL_STRING_SIZE;
-	size_t str_pos = 0;
-
-	*size = 0;
-	if (filename && size) {
-
-		/* Open file and allocate string buffer */
-		f = fopen(filename, "r");
-		if (!f) return NULL;
-
-		str = realloc(NULL, sizeof(char) * str_sz);
-		if (!str) {
-			fclose(f);
-			return NULL;
-		}
-		str[0] = '\0';
-
-		/* Iterate over file's contents */
-		while (!feof(f)) {
-			c = fgetc(f);
-
-			/* Check if the string buffer is not too small. */
-			if (str_pos == str_sz) {
-				str_sz *= 2;
-				str = realloc(str, str_sz);
-
-				if (!str) {
-					fclose(f);
-					return NULL;
-				}
-			}
-
-			switch(c) {
-				case '\n': {
-
-					break;
-				} case ',': {
-
-					break;
-				} default: {
-					str[str_pos++] = c;
-					str[str_pos] = '\0';
-					break;
-				}
-			}
-		}
-
-		free(s);
-		fclose(f);
-	}
-
-	return r;
 }
 
 int toy(int argc, char** argv) {
@@ -124,7 +58,7 @@ int toy(int argc, char** argv) {
 		, {"estrela 3", "estrela", 3}
 	};
 
-	HashTable *H = HashTable_newWith(sz, sz, Estrela_hash, NULL);
+	HashTable *H = HashTable_newwith(sz, sz, Estrela_hash, NULL);
 
 	/* Péssima forma de verificar erros, mas é só um exemplo! */
 	if (!H) {
@@ -153,7 +87,7 @@ int toy(int argc, char** argv) {
 	}
 
 	/* Finalização */
-	HashTable_free(H, NULL, NULL);
+	HashTable_free(H);
 
 	printf("\nFinished.");
 	return 0;
